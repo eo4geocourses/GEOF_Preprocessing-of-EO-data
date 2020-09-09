@@ -1,0 +1,762 @@
+<!-- 	Template Authors: Stefan Lang, Eva Missoni - PLUS 
+		Template Creation Date: March-June 2020 
+		
+		IMPORTANT NOTICES FOR USERS/AUTHORS: 
+		SECTIONS TO BE EDITED BY AUTHORS ARE INDICATED AS FOLLOWS:  <!-- AUTHORS: DEFINE ... --> 
+<!--	THE COMMANDS <section> and </section>  EMBRACE THE CONTENT FOR EACH SINGLE SLIDE.
+		ALTERNATIVELY, YOU CAN USE MARKDOWN NOTATION TO CREATE YOUR SLIDES. More information: https://github.com/webpro/reveal-md 
+		-->
+		
+		
+<!doctype html>
+<html lang="en" >
+
+	<head>
+		<meta charset="utf-8">
+		 
+		<title>EO4GEO_GEOF: Preprocessing of EO data - Geometry</title>
+
+		<link rel="stylesheet" href="internal_restricted/v1.0/css/reveal.css">
+		<!-- CHOOSE BETWEEN 2 EO4GEO TEMPLATE THEMES:-->
+		<link rel="stylesheet" href="internal_restricted/v1.0/css/theme/eo4geo.css" id="theme"> <!-- white background design --> 
+		<link rel="stylesheet" href="internal_restricted/v1.0/plugin/markdown/css/theme/simplemenu.css">
+		<link rel="stylesheet" href="internal_restricted/v1.0/css/theme/eo4geo_grey.css" id="theme">  <!-- anthrazit background design --> 
+		<!-- EO4GEO FONT ROBOTO SLAB -->
+		<link href='https://fonts.googleapis.com/css?family=Roboto Slab' rel='stylesheet'> 
+		<link rel="stylesheet" href="partnerLogo.css" id="theme"> 
+		<link rel="stylesheet" href="customer_content/css/eo4geo_override.css" id="theme">
+
+    <base target="_blank"> <!-- All links in the presentation are opened in a seperate tab"-->
+ 
+	</head>
+
+	<body>
+		  
+<div class="reveal" >
+		
+			 <!-- FORMATTING FOR HEADER -->
+			
+					
+				 <div class = "eo4geologo" style="width: 11%;height : 11%" ></div>	
+			
+				 <div class = "partnerlogo" style="width: 8%;height : 9%" ></div>		
+				 <div  class = "presentation_title" style=" text-align: center " >Preprocessing of EO data - Geometry</div>	<!--The title of the presentation appears on each slide-->
+
+			<!-- AUTHORS: DEFINE METADATA FOR WHOLE SLIDESET HERE: (Dublin Core Metadata format, complemented by BoK-Concepts) >
+				@prefix dc: <http://purl.org/dc/terms/>.
+				@prefix eo4geo: <http://bok.eo4geo.eu/>.
+				<>  	dc:title "Copernicus Service - Land";
+					dc:creator "Andrija Krtalic, University of Zagreb, Faculty of Geodesy";
+					dc:subject "Copernicus, EO4GEO, WP4, Satellite, Earth Observation";
+					dc:abstract "This is a lesson on Copernicus Services for land monitoring.";
+					dc:tableOfContents "(1) What is EO?; (2) Benefits of Copernicus; (3) Integration of Jupyter Notebooks; 
+						(4) Integration of Youtube Video; (5) Integration of H5P; (6) Copernicus Services; (7) Reference list;";
+					dc:description "Learning outcomes: Understand the Copernicus ecosystem and services; perform simple analysis with Jupyter Notebook; Understand Copernicus Climate Change Service;";
+					dc:contributor "Eva Missoni, Barbara Hofer";
+					dc:created "2020-06-20";
+					dc:type "InteractiveResource";
+					dc:format "html";
+					dc:language "EN"; 
+					dc:SizeOrDuration "45min"
+					dc:audience "students";
+					dc:educationLevel "EQF 6";
+					dc:source "";
+					dc:rightsHolder "Andrija Krtalic, UniZG";
+					dc:license "CC BY-SA 4.0";
+					dc:relation eo4geo:CV2-1;
+								-->
+
+
+				<div class="slides">
+				
+			
+				<!-- AUTHORS: DEFINE CONTENT ON YOUR FIRST SLIDE --> 
+				<section >
+					<h1>Preprocessing of EO data - Geometry</h1>
+					(EO4GEO - Faculty of Geodesy University of Zagreb)
+				<!-- AUTHORS: PUT YOUR PRESENTER NOTES HERE: -->
+				<aside class="notes">
+				Earth Observation for decision-making
+				Targeted and efficient environmental policies need a strong evidence base that accounts for the geographical distribution of environmental phenomena and economic activity. The existing evidence base of environmental policies has traditionally suffered from data gaps or incoherent time series. Earth observation from satellites, aircrafts and drones, in-situ measurements or ground-based monitoring stations, can provide a unique and timely source of data that is commensurable across countries, regions and cities. It can help harmonise international reporting on natural resources, ecosystems and environmental sinks. It can be combined with other geo-referenced socio-demographic, economic and public administration data to make indicators and analysis more relevant and targeted. Earth observation is not new, but it is only recently that investments in satellite capabilities, open and free access to data and tools, and advances in algorithms and data processing have started to enable the widespread use of this information at scale, and beyond the specialised scientific community. These developments offer opportunities for improving the range and robustness of environmental data and indicators.
+				https://www.earthobservations.org/geoss.php
+				</aside>
+				</section>
+				
+
+				<section id="intro"> 
+
+					<section > 
+					<h1>Sources of Geometric Distortion</h1> 
+					<ul>
+					<li>There are potentially many more sources of geometric distortion of images than radiometric distortion, and their effects can be quite severe.</li>
+					<li>Some are more important with aircraft platforms whereas others are a greater problem for satellite based sensors.</li>
+					<li>They can be related to a number of factors, including:
+					<ul>
+					<li>the rotation of the earth during image acquisition</li>
+					<li>variations in platform altitude, attitude and velocity</li>
+					<li>the wide field of view of some sensors</li>
+					<li>the curvature of the earth</li>
+					<li>the finite scan rate of some sensors</li>
+					<li>sensor non-idealities</li>
+					</ul>
+					</li>
+					</ul>
+					</section>
+					
+					<section > 
+					<h1>Sources of Geometric Distortion (2)</h1> 
+					<ul>
+					<li>To understand why geometric distortion occurs, it is important to envisage how an image is formed.</li>
+					<li>If one imagines that a particular sensor records L lines of M pixels each then it would be natural to form the image by laying the L lines down successively one under the other.</li>
+					<li>If the IFOV of the sensor has an aspect ratio of unity then this is the same as arranging the pixels for display on a square grid.</li>
+					<li>The grid intersections are the pixel positions and the spacing between the grid points is equal to the sensor&rsquo;s IFOV.</li>
+					</ul>
+					</section>
+
+					<section > 
+					<h1>Sources of Geometric Distortion (3)</h1> 
+					<ul>
+					<li>The display grid used to build up an image from the digital data stream of pixels generated by a sensor</li>
+					</ul>
+					<br><img width="450" height="400" img src="http://eo4geo.sbg.ac.at/GEOF/Preprocessing-of-EO-data/Slide-04_Image_grid.jpg" alt="sat1">
+					</section>
+
+					
+					<section>
+					<br>
+					<h1>The Effect of Earth Rotation</h1> 
+					<ul>
+					<li>Sensors that record one line of data at a time will incur distortion in the recorded image product as a result of the rotation of the earth.</li>
+					<li>During the frame acquisition time the <span style="color: #ff0000;"><strong>earth rotates from west to east</strong></span> - a pixel imaged at the end of the frame would have been further to the west when recording started.</li>
+					<li>Therefore if the lines of pixels recorded were arranged for display, the later lines would be erroneously displaced to the east in terms of the terrain they represent.</li>
+					<li>To give the pixels their correct positions relative to the ground it is necessary to offset the bottom of the image to the west by the amount by which the ground has moved during image acquisition.</li>
+					<li>The amount by which the image has to be skewed to the west at the end of the frame depends on the relative velocities of the satellite and earth, and the length of the image frame recorded.</li>
+					</ul>				
+					</section>
+
+					<section>
+					<br>
+					<h2>The Effect of Earth Rotation (2)</h2> 
+					<img width="450" height="300" img src="http://eo4geo.sbg.ac.at/GEOF/Preprocessing-of-EO-data/Slide-06_Error_Earth_rotation.jpg" alt="sat1">
+					<p>Effect of earth rotation on image geometry when data is acquired as scan lines:</p>
+					<ol style="list-style-type: lower-alpha;">
+					<li>image in which the pixels are arranged on a square grid,</li>
+					<li>offset of successive groups of lines to the west to correct for earth rotation during image acquisition.</li>
+					</ol>				
+					</section>
+
+					<section>
+					<br>
+					<h1>The Effect of Variations in Platform Altitude, Attitude and Velocity</h1> 
+					<ul>
+					<li>Variations in the elevation or altitude of a remote sensing platform lead to a scale change at constant angular IFOV and field of view (<span style="color: #0000ff;">Figure a</span>).</li>
+					<li>Similarly, if the platform forward velocity changes, a scale change occurs in the along-track direction (<span style="color: #0000ff;">Figure b</span>).</li>
+					<li>Platform attitude changes can be resolved into yaw, pitch and roll during forward travel.</li>
+					<li>These lead to image rotation, along track and across track displacement (<span style="color: #0000ff;">Figure c, d, e</span>).</li>
+					<li>For example, while the field of view of a sensor broadens with rising platform height, mapping the recorded pixels onto the image grid will lead to an apparent compression of detail compared with that at lower altitudes.</li>
+					</ul>			
+					</section>
+
+					<section>
+					<br>
+					<h2>The Effect of Variations in Platform Altitude, Attitude and Velocity (2)</h2> 
+					<table style="height: 387px; width: 657.484px;">
+					<tbody>
+					<tr>
+					<td style="width: 320px;"><img src="http://eo4geo.sbg.ac.at/GEOF/Preprocessing-of-EO-data/Slide-08_Platform_effect.jpg" alt="" width="349" height="380" /></td>
+					<td style="width: 321.484px;">
+					<p>Effect of platform position and attitude variations on the region of the earth being imaged.</p>
+					<p>These variations can be described mathematically.</p>
+					<p>A knowledge of the platform ephemeris is needed for their magnitudes to be computed.</p>
+					</td>
+					</tr>
+					</tbody>
+					</table>
+					<p>Variations in the elevation or altitude of a remote sensing platform lead to: <strong>a</strong><strong>)</strong> a scale change at constant angular IFOV and field of view; <strong>b)</strong> a scale change in the along-track direction; <strong>c</strong> &ndash; <strong>e)</strong> changes in yaw, pitch and roll during forward travel.</p>			
+					</section>					
+					
+				</section>
+
+
+			
+				<section id="Geometry"> 
+
+					<section>
+					<br>
+					<h2>Geometric charasteristics of Across-track (Whiskbroom) Scanner Imagery: Tangential-Scale Distortion</h2> 
+					<ul>
+					<li>Across-track imagery manifeest severe scale distortion in a direction perpendicular to the flight direction.</li>
+					<li>The problem arises because a scanner mirror rotating at constant angular velocity.</li>
+					<li>For any increment of time, the mirror sweeps through a constant incremental arc, &Delta;&theta;.</li>
+					<li>Because the mirror rotates at a constant angular velocity, &Delta;&theta; is the same at eny scan angle &theta;.</li>
+					<li>The ground element, &Delta;X, covered per unit time increases with increasing distance from the nadir.</li>
+					<li>This resulting in image scale compression at points away from the nadir, as the ground spot covers a great distance at its increasing ground speed.</li>
+					<li>Resulting distortion is known as <strong>tangential-scale</strong> <strong>distortion</strong>.</li>
+					</ul>			
+					</section>
+
+					<section>
+					<h2>Geometric charasteristics of Across-track (Whiskbroom) Scanner Imagery: Tangential-Scale Distortion (2)</h2> 
+					<img width="600" height="180" img src="http://eo4geo.sbg.ac.at/GEOF/Preprocessing-of-EO-data/Slide-10_Across-scanner_geometry.jpg" alt="sat1">
+					<img width="600" height="180" img src="http://eo4geo.sbg.ac.at/GEOF/Preprocessing-of-EO-data/Slide-10_Across-scanner_geometry_2.jpg" alt="sat1">
+					<p>Tangential-scale distortion in unrectified scanner imagery: a) vertical aerial (matrix) photograph; b) across-track scanner imagery.</p>
+					</section>	
+
+					<section>
+					<br>
+					<h2>Geometric charasteristics of Across-track (Whiskbroom) Scanner Imagery: Tangential-Scale Distortion (3)</h2> 
+					<ul>
+					<li>Because of the constant longitudinal scene and varying lateral scale of the scanner imagery, object do not maintain their proper shapes.</li>
+					<li>Linear features &ndash; other than those parallel or normal to the scan lines &ndash; take on an S-shape <span style="color: #ff0000;"><strong>sigmoid</strong> <strong>curvature</strong></span>.</li>
+					<li>Extreme compression of ground features characterizes the image near its edges.</li>
+					</ul>					
+					</section>	
+
+					<section>
+					<h2>Geometric charasteristics of Across-track (Whiskbroom) Scanner Imagery: Tangential-Scale Distortion (4)</h2> 
+					<img width="350" height="350" img src="http://eo4geo.sbg.ac.at/GEOF/Preprocessing-of-EO-data/Slide-12_Across-scanner_geometry_3_Image.jpg" alt="sat1">
+					<p>Across-track scanner image illustrating tangential distortion, 100 m flying height.</p>
+					</section>
+					
+					<section>
+					<h2>Geometric charasteristics of Across-track (Whiskbroom) Scanner Imagery: Resolution Cell Size Variations</h2> 
+					<ul>
+					<li>Across-track scanners sense energy over ground resolution cells of continuosly varying size.</li>
+					<li>An increased cell size is obtained as the IFOV of a scanner moves outward from the flight nadir.</li>
+					</ul>					
+					<img width="450" height="350" img src="http://eo4geo.sbg.ac.at/GEOF/Preprocessing-of-EO-data/Slide-13_Across-scanner_geometry_3_Resolution.jpg" alt="sat1">
+					<p>Resolution cell size variations.</p>
+					</section>	
+
+					<section>
+					<h2>Geometric charasteristics of Across-track (Whiskbroom) Scanner Imagery: Resolution Cell Size Variations (2)</h2> 
+					<ul>
+					<li>At the nadir line, the <span style="color: #ff0000;">ground resolution</span> cell has a dimension of H&beta;<em>.</em></li>
+					<li>At a scan angle &theta;, the distance from the aircraft to the cell becomes H_&theta;=H&prime;sec⁡&theta;.</li>
+					<li>The size of the <span style="color: #ff0000;">resolution cell increases</span>.</li>
+					<li>The cell has dimension of (H&prime;sec&sup2;⁡&theta;)&beta; <span style="color: #ff0000;">in the direction</span> of flight and (H&prime;sec⁡&theta;) &beta; <span style="color: #ff0000;">in the direction of scanning</span>.</li>
+					<li>These are actually the <span style="color: #ff0000;"><strong>nominal</strong> <strong>dimension</strong></span> of the measurements cell.</li>
+					<li>The <strong>true</strong> <strong>size</strong> and shape of a ground resolution cell are a function not only of &beta;, H&prime; and &theta; but also of the <span style="color: #0000ff;"><strong>response</strong><strong> time </strong></span>of a particular scanner&rsquo;s electronics.</li>
+					</ul>
+					</section>	
+					
+					<section>
+					<h2>Geometric charasteristics of Across-track (Whiskbroom) Scanner Imagery: Resolution Cell Size Variations (3)</h2> 
+					<ul>
+					<li>The <span style="color: #ff0000;">response time</span> is a measure of the <span style="color: #ff0000;">time that a scanner takes to respond electronically</span> to a change in ground reflected or emitted energy.</li>
+					<li>Therefore, optic control resolution cell size in the direction of flight, while both optics and electronic can influence the cell size in the direction of scan.</li>
+					<li>Although it is rarely critical to know the precise degree of resolution cell size variation.</li>
+					<li>It is important to realize the effect this variation has on the interpretability of the imagery at various scan angles.</li>
+					<li>When objects smaller than the area viewed by the IFOV are imaged, background features also contribute to the recorded signal.</li>
+					<li>This is particulary important in thermal scanning applications.</li>
+					<li><span style="color: #ff0000;"><strong>For </strong><strong>an</strong> <strong>object</strong><strong> to </strong><strong>be</strong> <strong>registered</strong> <strong>with</strong><strong> the </strong><strong>proper</strong> <strong>radian</strong><strong> temperature, </strong><strong>its</strong> <strong>size</strong><strong> must </strong><strong>be</strong> <strong>larger</strong> <strong>than</strong><strong> the </strong><strong>ground</strong> <strong>resolution</strong> <strong>cell</strong></span><strong>.</strong></li>
+					</ul>
+					</section>	
+
+					<section>
+					<h2>Geometric charasteristics of Across-track (Whiskbroom) Scanner Imagery: One-Dimensional Relief Displacement</h2> 
+					<ul>
+					<li>Since all objects are viewed by the scanner only along &lsquo;&rsquo;side-looking&rsquo;&rsquo; scan lines, relief displacement occurs only in this single direction.</li>
+					</ul>
+					<img width="550" height="250" img src="http://eo4geo.sbg.ac.at/GEOF/Preprocessing-of-EO-data/Slide-16_Across-scanner_Matrix_geometry_effect.jpg" alt="sat1">
+					<p>Relief displacement on a (matrix) photograph versus an across-track scanner image. <span style="color: #ff0000;"><strong>a)</strong></span> In a vertical aerial photograph, vertical features are displaced radially from the principal point (center of image). <span style="color: #ff0000;"><strong>b)</strong></span> In an across-track scanner image, vertical features are displacement at right angles from the nadir line.</p>					
+					</section>	
+
+					<section>
+					<h2>Geometric charasteristics of Across-track (Whiskbroom) Scanner Imagery: One-Dimensional Relief Displacement</h2> 
+					<ul>
+					<li>Across-track scanning is a dynamic continuous process.</li>
+					<li>Any variations in the aircraft flight trajectory during scanning affect the relative position of points recorded on the resulting imagery.</li>
+					</ul>
+					<img width="550" height="250" img src="http://eo4geo.sbg.ac.at/GEOF/Preprocessing-of-EO-data/Slide-17_Along-scanner_geometry.jpg" alt="sat1">
+					<p>Across-track scanner imagery distortions induced by aircraft attitude deviations: a) ground scene (matrix), b) scanner image, c) roll distortion, d) crab distortion, e) pitch distortion.</p>					
+					</section>	
+
+				</section>	
+				
+				
+				<section id="Geometry"> 
+
+					<section>
+					<br>
+					<h2>Geometric charasteristics of Along-track (Push-broom) Scanner Imagery</h2> 
+					<ul>
+					<li>The geometric characteristic of along-track scanner images are quite different from those of across-track scanner images.</li>
+					<li>Along-track scanners have no scanning mirror.</li>
+					<li>There is a fixed geometric relationship among the solid-state detector elements recording each scan line.</li>
+					</ul>
+					<img width="450" height="180" img src="http://eo4geo.sbg.ac.at/GEOF/Preprocessing-of-EO-data/Slide-18_Along-scanner_geometry_2.jpg" alt="sat1">
+					<p>Geometry of one line of an along-track scanner image.</p>		
+					</section>
+					
+					<section>
+					<br>
+					<h2>Geometric charasteristics of Along-track (Push-broom) Scanner Imagery</h2> 
+					<ul>
+					<li>The uniformly spaced detectors in the sensor array view uniformly spaced ground resolution elements.</li>
+					<li>Along-track scanners are not subject to tangential scale distortion.</li>
+					<li>So, a vertical image acquired over flat terrain would have uniform scale in the cross-track direction.</li>
+					<li>Along-track scanners also manifest one-dimensional relief displacement, with objects above the terrain being displaced pependicularly away from the nadir line.</li>
+					<li>Objects along the nadir line are not displaced, while the degree of displacement increases toward the edge of each scan line.</li>
+					</ul>	
+					</section>					
+					
+					<section>
+					<br>
+					<h2>Geometric charasteristics of Along-track (Push-broom) Scanner Imagery (2)</h2> 
+					<img width="550" height="300" img src="http://eo4geo.sbg.ac.at/GEOF/Preprocessing-of-EO-data/Slide-20_Along-scanner_geometry_3.jpg" alt="sat1">
+					<p>One-dimension relief displacement in an along-track scanner image.</p>
+					</section>					
+					
+					<section>
+					<br>
+					<h2>Geometric charasteristics of Along-track (Push-broom) Scanner Imagery (3)</h2> 
+					<ul>
+					<li>In esence, the geometry along each line of an along-track scanner image is similar to that of an aerial (matrix) photograph.</li>
+					<li>Line-to-line variation in imaging geometry is coused purely by any changes in the altitude or attitude (angular orientation) of the aircraft along a flight line.</li>
+					<li>On-bord inertial measurement units and GPS system are used to measure these variations and geometrically correct the data from along-track scanners.</li>
+					</ul>
+					</section>						
+					
+				</section>	
+
+				<section id="Planininini"> 
+
+					<section>
+					<br>
+					<h2>Geometric Correction: Planimetrically Correct Image</h2> 
+					<ul>
+					<li>A critical consideration in the application of remote sensing is preparation of planimetrically correct versions of aerial and satellite images.</li>
+					<li>The orthophoto - created by analysis of stereo imagery through removal of positional effects of topographic relief to produce a positionally accurate image.</li>
+					<li>Similar products can be prepared by applying a precise knowledge of the internal geometry of the instrument and of the sensor&rsquo;s position in space relative the terrain to derive planimetrically correct versions of an aerial or satellite image.</li>
+					</ul>
+					</section>
+					
+					<section>
+					<br>
+					<h2>Geometric Correction: Image Registration</h2> 
+					<ul>
+					<li>A second approach to image registration - <span style="color: #ff0000;"><strong>image </strong><strong>registration</strong></span><strong> -</strong> approaches the problem in a completely different manner.</li>
+					<li>No effort is made to apply our knowledge of system geometry;</li>
+					<li>The images are treated simply as an array of values that must be manipulated to create another array with the desired geometry.</li>
+					<li><span style="color: #ff0000;"><strong>Re</strong></span><strong><span style="color: #ff0000;">gistration</span> </strong>scales, rotates, translates, and performs related manipulations as necessary to bring the <span style="color: #0000ff;">geometry of an image</span> <span style="color: #0000ff;">to match a particular reference</span> image of desired properties.</li>
+					<li>Such processes constitute the practice of <span style="color: #ff0000;">image registration</span> &mdash; the application of interpolation to bring an image into registration with another image.</li>
+					</ul>
+					</section>					
+					
+					<section>
+					<br>
+					<h2>Geometric Correction: Image Registration (2)</h2> 
+					<ul>
+					<li><span style="color: #ff0000;">Image registration</span> forms a convenient alternative to the analytical approach.</li>
+					<li><span style="color: #0000ff;">It does not require the detailed data describing the instrument and its operation.</span></li>
+					<li><span style="color: #000000;">Although registration may provide useful representations of images, users should recognize that <span style="color: #ff0000;"><strong>resampled</strong> <strong>images are not equivalent to orthographic representations</strong></span>.</span></li>
+					<li>Although registration can apply to vector data, our discussion here refers to raster images.</li>
+					</ul>
+					</section>							
+					
+					<section>
+					<br>
+					<h2>Geometric Correction: Image to Image Registration</h2> 
+					<ul>
+					<li>Two images can be registered to each other by registering each to a map coordinate base separately.</li>
+					<li>One image can be chosen as a <span style="color: #ff0000;"><strong>master, or reference</strong></span>, to which the other, known as the <span style="color: #0000ff;"><strong>slave</strong></span>, is registered.</li>
+					<li>The method depends on establishing mathematical relationships between the addresses of pixels in an image and the corresponding coordinates of those points on the.</li>
+					<li>Those relationships can be used to correct image geometry irrespective of the analyst&rsquo;s knowledge of the source and type of distortion.</li>
+					<li>This approach is the most commonly used and, as a technique, is independent of the platform used for data acquisition.</li>
+					</ul>
+					</section>						
+
+					<section>
+					<br>
+					<h2>Geometric Correction: Image to Image Registration (2)</h2> 
+					<ul>
+					<li>Two sets of identical control points were chosen.</li>
+					<li>One on maste and one on slave image.</li>
+					<li>The points are distributed as nearly as possible in a uniform manner around the edge of the image segment, with some points located across the centre of the image.</li>
+					<li>Spatial correlation algorithms can be used to assist in accurate co-location of control point pairs.</li>
+					<li>Each band of image data has to be corrected.</li>
+					<li>Since it can usually be assumed that the bands are well registered to each other, steps taken to correct one band can be used on all remaining bands.</li>
+					</ul>
+					</section>						
+					
+					<section>
+					<br>
+					<h2>Geometric Correction: Image to Image Registration (3)</h2> 
+					<img width="550" height="370" img src="http://eo4geo.sbg.ac.at/GEOF/Preprocessing-of-EO-data/Slide-27_Image_to_image.jpg" alt="sat1">			
+					<p>Geometric registration consists of identifying the coordinates of a few well-defined (and visible) ground control points (GCP) in the distorted picture (A - A1 to A4) and their adaptation to the real position of the GCP (e.g. latitude and longitude).</p>
+					</section>	
+
+					<section>
+					<br>
+					<h2>Geometric Correction: Image to Image Registration (4)</h2> 
+					<img width="650" height="370" img src="http://eo4geo.sbg.ac.at/GEOF/Preprocessing-of-EO-data/Slide-28_Image_to_image_2.jpg" alt="sat1">			
+					<p>Image registration on to master (referent) image</p>
+					</section>	
+
+				</section>	
+
+
+				<section id="GCP"> 
+
+					<section>
+					<br>
+					<h1>Identification of GCPs</h1> 
+					<ul>
+					<li>A practical problem in applying image registration procedures is the selection of control points.</li>
+					<li>GCPs are features that can be located with precision and accuracy on accurate maps yet that are also easily located on digital images.</li>
+					<li>Ideally, GCPs could be as small as a single pixel, if one could be easily identified against its background.</li>
+					<li>In practice, most GCPs are likely to be spectrally distinct areas as small as a few pixels.</li>
+					<li>Examples might include intersections of major highways, distinctive water bodies, edges of land-cover parcels, stream junctions, and similar features.</li>
+					<li>Identifying such points seems to be an easy task.</li>
+					<li>However, registration errors can be a serious obstacle to the whole analytical process that requires precision.</li>
+					</ul>
+					</section>
+
+					<section>
+					<br>
+					<h2>Identification of GCPs (2)</h2> 
+					<img width="650" height="370" img src="http://eo4geo.sbg.ac.at/GEOF/Preprocessing-of-EO-data/Slide-30_GCPs.jpg" alt="sat1">			
+					<p>Examples of ground control points (satellite image vs aerial photo vs map) GCPs must be identifiable both on the image and on a planimetrically correct reference map.</p>
+					</section>
+
+					<section>
+					<br>
+					<h2>Identification of GCPs (3)</h2> 
+					<ul>
+					<li>Typically, it is relatively easy to find a rather small or modest-sized set of control points.</li>
+					<li>However, in some scenes, the analyst finds it increasingly difficult to expand this set.</li>
+					<li>Thus there may be a rather small set of &ldquo;good&rdquo; GCPs, points that the analyst can locate with confidence and precision both on the image and on an accurate map of the region.</li>
+					<li>The locations may also be a problem.</li>
+					<li>In principle, GCPs should be dispersed throughout the image, with good coverage near edges.</li>
+					<li>There is little to be gained from having a large number of GCPs if they are all concentrated in a few regions of the image.</li>
+					<li>The desire to select &ldquo;good&rdquo; GCPs and achieve good dispersion can work against each other.</li>
+					</ul>
+					</section>
+
+				</section>	
+					
+				<section id="Geocoding"> 
+
+					<section>
+					<br>
+					<h1>Geometric Correction: Geocoding</h1> 
+					<ul>
+					<li>If the <span style="color: #ff0000;">master image pixels</span> have the <span style="color: #0000ff;">information about the position within the national coordinate system</span>, such image to image registration is called <span style="color: #ff0000;"><strong>geocoding</strong></span>.</li>
+					<li><span style="color: #ff0000;"><strong>Geo</strong><strong>coding</strong> </span>indicates that registration of an image requires matching not only to a reference image but also to reference points.</li>
+					<li><span style="color: #ff0000;"><strong>Geo</strong><strong>cod</strong><strong>ed</strong> <strong>images </strong></span>are presented in a specific <span style="color: #0000ff;">geographic projection</span> so that the image is presented in a defined projection and <span style="color: #0000ff;">coordinate system</span>.</li>
+					<li>Geocoding is important for images that are to be used as locational references or to be matched to other maps and images.</li>
+					</ul>
+					</section>
+
+					<section>
+					<br>
+					<h2>Geometric Correction: Geocoding (2)</h2> 
+					<ul>
+					<li>The <span style="color: #0000ff;">locations of the output pixels</span> are derived from locational information provided by <span style="color: #ff0000;"><strong>ground control points </strong></span>(GCPs).</li>
+					<li>If two images are to be registered, GCPs <span style="color: #ff0000;">must be easily</span> <span style="color: #ff0000;">recognized on both images</span>.</li>
+					<li>The locations of these points establish the <span style="color: #ff0000;">geometry of the output</span> image and its relationship to the input image.</li>
+					<li>Thus this first step establishes the framework of pixel positions for the output image using the GCPs.</li>
+					</ul>
+					</section>
+					
+					<section>
+					<br>
+					<h2>Geometric Correction: Geocoding - Example</h2> 
+					<table style="height: 370px;" width="884">
+					<tbody>
+					<tr style="height: 323px;">
+					<td style="width: 434.258px; height: 323px;"><img src="http://eo4geo.sbg.ac.at/GEOF/Preprocessing-of-EO-data/Slide-34_Rotor_TV.jpg" alt="" width="400" height="300" /></td>
+					<td style="width: 434.258px; height: 323px;"><img src="http://eo4geo.sbg.ac.at/GEOF/Preprocessing-of-EO-data/Slide-34_Rotor_satellite.jpg" alt="" width="504" height="300" /></td>
+					</tr>
+					<tr style="height: 50.6914px;">
+					<td style="width: 434.258px; height: 50.6914px; text-align: center;">Frame from aerial TV video (1998) - slave image</td>
+					<td style="width: 434.258px; height: 50.6914px; text-align: center;">Pancromatic satelite image (1992) &ndash; master (referent)</td>
+					</tr>
+					</tbody>
+					</table>
+					</section>					
+					
+					<section>
+					<br>
+					<h2>Geometric Correction: Geocoding - Example (2)</h2> 
+					<table style="height: 370px;" width="884">
+					<tbody>
+					<tr style="height: 323px;">
+					<td style="width: 434.258px; height: 323px; text-align: center;"><img src="http://eo4geo.sbg.ac.at/GEOF/Preprocessing-of-EO-data/Slide-35_Rotor_TV_geocod.jpg" alt="" width="315" height="350" /></td>
+					<td style="width: 434.258px; height: 323px; text-align: center;"><img src="http://eo4geo.sbg.ac.at/GEOF/Preprocessing-of-EO-data/Slide-35_Rotor_TV_geocod_ower_satellite.jpg" alt="" width="416" height="250" /></td>
+					</tr>
+					<tr style="height: 50.6914px;">
+					<td style="width: 434.258px; height: 50.6914px; text-align: center;">
+					<p>The result of registration and resamppling.</p>
+					</td>
+					<td style="width: 434.258px; height: 50.6914px; text-align: center;">
+					<p>The overlapping of result of registration and reference images.</p>
+					</td>
+					</tr>
+					</tbody>
+					</table>
+					</section>					
+					
+				</section>	
+					
+					
+					
+				<section id="Georeferencing"> 
+
+					<section>
+					<br>
+					<h1>Geometric Correction: Georeferencing</h1> 
+					<ul>
+					<li><span style="color: #ff0000;"><strong>G</strong><strong>eoreferencing</strong> </span>is related to but distinct from and <span style="color: #ff0000;">geocoding</span><em>.</em></li>
+					<li><span style="color: #ff0000;"><strong>G</strong><strong>eoreferencing</strong> </span>- Aligning geographic data to a known coordinate system so it can be viewed, queried, and analyzed with other geographic data (like geocoding).</li>
+					<li>Georeferencing and geocoding may involve shifting, rotating, scaling, skewing, and in some cases warping, rubber sheeting.</li>
+					<li>But, <span style="color: #ff0000;">georeferencing</span> involve <span style="color: #ff0000;"><strong>orthorectifying</strong> </span>the data (all pixels of an image, opposed to geocoding &ndash; just the GCP).</li>
+					<li>The <span style="color: #0000ff;">digital terrain model</span> (DTM) is <span style="color: #0000ff;">necessary</span> to have for geocoding.</li>
+					</ul>
+					</section>
+
+					<section>
+					<br>
+					<h2>Geometric Correction: Georeferencing (2)</h2> 
+					<img width="500" height="500" img src="http://eo4geo.sbg.ac.at/GEOF/Preprocessing-of-EO-data/Slide-37_DTM.jpg" alt="sat1">			
+					</section>	
+					
+					<section>
+					<br>
+					<h2>Geometric Correction: Georeferencing (3)</h2> 
+					<img width="700" height="420" img src="http://eo4geo.sbg.ac.at/GEOF/Preprocessing-of-EO-data/Slide-38_Georeferencing.jpg" alt="sat1">			
+					<p>The original photogrammetric image (central projection) vs&nbsp;Georeferenced, photogrammetric image (orthogonal projection)</p>					
+					</section>					
+
+					<section>
+					<br>
+					<h2>Geometric Correction: Georeferencing (4)</h2> 
+					<img width="500" height="500" img src="http://eo4geo.sbg.ac.at/GEOF/Preprocessing-of-EO-data/Slide-39_Georeferencing_2.jpg" alt="sat1">			
+					</section>						
+	
+					
+				</section>						
+					
+					
+					
+				<section id="Resampling"> 
+
+					<section>
+					<br>
+					<h1>Geometric Correction by Resampling</h1> 
+					<table style="height: 412px; width: 1009.2px;">
+					<tbody>
+					<tr>
+					<td style="width: 495px;">
+					<ul style="text-align: center;">
+					<li>Thus, <span style="color: #ff0000;">registration, geocoding or georeferencing process</span> is first step establishes the framework of <span style="color: #0000ff;">pixel positions for the output image</span> using the GCPs or DTM.</li>
+					<li>The next step is to decide <span style="color: #ff0000;">how to best estimate the values of pixels</span> in the corrected image, based on information in the uncorrected image.</li>
+					</ul>
+					<p>&nbsp;</p>
+					</td>
+					<td style="width: 500.203px; padding-left: 90px; text-align: center;">
+					<p><img src="http://eo4geo.sbg.ac.at/GEOF/Preprocessing-of-EO-data/Slide-40_Resampling.jpg" alt="" width="251" height="300" /></p>
+					<p>Matrix of geometrically correct output pixels superimposed on matrix of original, distorted input pixels</p>
+					</td>
+					</tr>
+					</tbody>
+					</table>
+					</section>
+
+					<section>
+					<br>
+					<h2>Geometric Correction by Resampling: Nearest-neighbor</h2> 
+					<ul>
+					<li><span style="color: #ff0000;">The simplest strategy</span> from a computational perspective is simply to <span style="color: #0000ff;">assign each &ldquo;corrected&rdquo; pixel the value from the nearest &ldquo;uncorrected&rdquo; pixel</span>.</li>
+					<li><span style="color: #ff0000;"><strong>Nearest</strong><strong>-</strong><strong>neighbour</strong><strong> resampling </strong></span>simply chooses the actual pixel that has its centre nearest to the point located in the image</li>
+					<li>This is the <span style="color: #ff0000;"><strong>nearest-neighbor</strong></span> approach to resampling.</li>
+					<li>It has the <span style="color: #ff0000;">advantages of simplicity and the ability</span> to <span style="color: #0000ff;">preserve the original values</span> of the unaltered scene &mdash; an advantage that may be critical in some applications.</li>
+					<li>On the other hand, <span style="color: #ff0000;">it may create noticeable positional errors</span>.</li>
+					</ul>
+					</section>					
+					
+					<section>
+					<br>
+					<h2>Geometric Correction by Resampling: Nearest-neighbor (2)</h2> 
+					<img width="400" height="400" img src="http://eo4geo.sbg.ac.at/GEOF/Preprocessing-of-EO-data/Slide-42_Nearest-neighbor206.jpg" alt="sat1">			
+					<p>Nearest-neighbor resampling. Each estimated value (*) receives its value from the nearest point on the reference grid (O).</p>
+					</section>						
+					
+					<section>
+					<br>
+					<h2>Geometric Correction by Resampling: Bilinear interpolation</h2> 
+					<ul>
+					<li>A second, more complex, approach to resampling is <span style="color: #ff0000;">bilinear interpolation</span>.</li>
+					<li><span style="color: #ff0000;"><strong>Bilinear interpolation </strong></span>calculates a value for each output pixel based on a weighted average of the four nearest input pixels.</li>
+					<li>In this context, &ldquo;weighted&rdquo; means that nearer pixel values are given greater influence in calculating output values than are more distant pixels.</li>
+					<li><span style="color: #ff0000;">Bilinear interpolation</span> uses three linear interpolations over the four pixels surrounding the point found in the image projected from a given display grid position.</li>
+					<li>Because each output value is based on several input values, the output image will not have the unnaturally blocky appearance of some nearest-neighbor images.</li>
+					</ul>			
+					</section>						
+
+					<section>
+					<br>
+					<h2>Geometric Correction by Resampling: Bilinear interpolation (2)</h2> 
+					<img width="350" height="350" img src="http://eo4geo.sbg.ac.at/GEOF/Preprocessing-of-EO-data/Slide-44_Bilinear interpolation.jpg" alt="sat1">			
+					<p>Bilinear interpolation. Each estimated value (*) in the output image is formed by calculating a weighted average of the values of the four nearest neighbors in the input image (O). Each estimated value is weighted according to its distance from the known values in the input image.</p>		
+					</section>						
+
+					<section>
+					<br>
+					<h2>Geometric Correction by Resampling: Bilinear interpolation (3)</h2> 
+					<ul>
+					<li>The image therefore has a <span style="color: #ff0000;"><strong>more &ldquo;natural&rdquo; look</strong></span>.</li>
+					<li>Yet there are important changes.</li>
+					<li>First, because bilinear interpolation creates new pixel values, the brightness values in the input image are lost.</li>
+					<li>The analyst may find that the range of brightness values in the output image differs from those in the input image.</li>
+					<li>Such changes to digital brightness values may be significant in later processing steps.</li>
+					<li>Second, because the resampling is conducted by averaging over areas (i.e., blocks of pixels), it decreases spatial resolution by a kind of &ldquo;smearing&rdquo; caused by averaging small features with adjacent background pixels.</li>
+					</ul>
+					</section>	
+
+					<section>
+					<br>
+					<h2>Geometric Correction by Resampling: Cubic Convolution</h2> 
+					<ul>
+					<li>Finally, the most sophisticated and most complex resampling method is <span style="color: #ff0000;">cubic convolution</span>.</li>
+					<li><span style="color: #ff0000;"><strong>Cubic convolution </strong></span>uses a weighted average of values within a neighborhood that extends about two pixels in each direction.</li>
+					<li>Typically, the images produced by cubic convolution resampling are much more attractive than those of other procedures.</li>
+					<li>But the data are altered more than are those of nearest-neighbor or bilinear interpolation, the computations are more intensive, and the minimum number of GCPs is larger.</li>
+					<li>Although both bilinear interpolation and cubic convolution alter pixel values as they interpolate to register images.</li>
+					</ul>
+					</section>	
+
+					<section>
+					<br>
+					<h2>Geometric Correction by Resampling: Cubic Convolution (2)</h2> 
+					<img width="350" height="350" img src="http://eo4geo.sbg.ac.at/GEOF/Preprocessing-of-EO-data/Slide-47_Cubic convolution208.jpg" alt="sat1">			
+					<p>Cubic convolution. Each estimated value in the output matrix (*) is found by assessing values within a neighborhood of 16 pixels in the input image (O).</p>
+					</section>	
+
+					<section>
+					<br>
+					<h2>Geometric Correction by Resampling: Need for Interpolation</h2> 
+					<table style="height: 456px;" width="856">
+					<tbody>
+					<tr>
+					<td style="width: 374.258px;">
+					<p>Determining a pixel brightness value for the display grid by:</p>
+					<ol style="list-style-type: lower-alpha;">
+					<li>nearest neighbour resampling,</li>
+					<li>bilinear interpolation and</li>
+					<li>cubic convolution interpolation;</li>
+					</ol>
+					<p>i, j etc. are discrete values of u; v.</p>
+					</td>
+					<td style="width: 375.508px; text-align: center;"><img src="http://eo4geo.sbg.ac.at/GEOF/Preprocessing-of-EO-data/Slide-48_Resampling_methods.jpg" alt="" width="455" height="420" /></td>
+					</tr>
+					</tbody>
+					</table>
+					</section>	
+					
+				</section>						
+					
+					
+					
+				<section id="Subsets"> 
+
+					<section>
+					<br>
+					<h1>Subsets</h1> 
+					<ul>
+					<li>Because of the very large sizes of many remotely sensed images, analysts typically work with those segments of full images that specifically pertain to the task at hand.</li>
+					<li>Therefore, to minimize computer storage and the analyst&rsquo;s time and effort, one of the first tasks in each project is to prepare <em>subsets</em>.</li>
+					<li>This step can be also coled: triage.</li>
+					</ul>
+					</section>
+					
+					<section>
+					<br>
+					<h1>Subsets (2)</h1> 
+					<ul>
+					<li>Often subsets must be &ldquo;registered&rdquo; to other data or to other projects.</li>
+					<li>Because time and computational effort devoted to matching images to maps or other images increase with large images, it is often convenient to prepare subsets before registration.</li>
+					<li>Yet if the subset is too small, then it may be difficult to identify sufficient landmarks for efficient registration.</li>
+					<li>Therefore, it may be useful to prepare a preliminary subset large enough to conduct the image registration effectively before selecting the final, smaller subset for analytical use.</li>
+					</ul>
+					</section>					
+					
+					<section>
+					<br>
+					<h1>Subsets (3)</h1> 
+					<img width="550" height="350" img src="http://eo4geo.sbg.ac.at/GEOF/Preprocessing-of-EO-data/Slide-51_Subsets199.jpg" alt="sat1">			
+					<p>Sometimes a subset of a particular area is too small to encompass sufficient points to allow the subset to be accurately matched to an accurate map. Selection of an intermediate temporary subset permits accurate registration using an adequate number of control points. After the temporary subset has been matched to the map, the study area can be selected more precisely without concern for the distribution of control points.</p>
+					</section>						
+					
+				</section>						
+				
+<section id="Conclusion"> 
+
+					<section>
+					<br>
+					<h1>Conclusions and take-aways</h1> 
+					<ul>
+					<li>soon to be added</li>
+					</ul>
+					</section>
+
+				</section>
+				
+
+				
+				<!-- AUTHORS: CREATE YOUR LIST OF REFERENCES HERE: -->
+				<section> 
+				<h2> Reference list </h2>
+				<br>
+				<reference_list>exemplary doi:<br><br>
+				Barbara Hofer (2018). Innovation in geoprocessing for a Digital Earth. International Journal in Digital Earth.
+				<br>
+				<a href="https://doi.org/10.1080/17538947.2017.1379154">10.1080/17538947.2017.1379154</a>
+				</reference_list>
+				</section>
+				
+				
+				<section>Slide show ends</section>
+			
+                </section>
+
+              </div>
+
+
+		<script src="internal_restricted/v1.0/js/reveal.js"></script>
+
+		<script>
+
+			Reveal.initialize({
+				controls: true,
+				progress: true,
+				history: true,
+				center: true,
+
+				// Optional libraries used to extend on reveal.js
+				dependencies: [
+					{ src: './internal_restricted/v1.0/plugin/markdown/marked.js', condition: function() { return !!document.querySelector( '[data-markdown]' ); } },
+                    { src: './internal_restricted/v1.0/plugin/markdown/markdown.js', condition: function() { return !!document.querySelector( '[data-markdown]' ); } },
+                    { src: './internal_restricted/v1.0/plugin/highlight/highlight.js', async: true, callback: function() { hljs.initHighlightingOnLoad(); } },
+					{ src: './internal_restricted/v1.0/plugin/notes/notes.js' },{ src: 'socket.io/socket.io.js', async: true },
+					{ src: './internal_restricted/v1.0/plugin/notes-server/client.js', async: true }
+					
+				]
+			});
+
+		</script>
+		
+		<!-- rauslöschen?? -->
+		<script>Reveal.initialize({
+			simplemenu: {
+				menuselector: '.menu a'
+			},
+			dependencies: [
+				{ src: './internal_restricted/v1.0/plugin/markdown/assets/js/revealjs/plugin/simplemenu/simplemenu.js', async: false } 
+			]
+			});
+		</script>
+
+	</body>
+</html>
